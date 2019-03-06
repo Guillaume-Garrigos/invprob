@@ -25,13 +25,19 @@ x0 = np.sign(sparse.randn(data_size,1,sparsity_level))
 noise = noise_level * np.random.randn(data_number,1)
 y = Phi@x0 + noise
 
+_ = plt.figure(dpi=dpi)
+sparse.stem(x0,"C0","ground truth")
+plt.show()
+
 # Let's try to visualize the solution of the LASSO (computed with the Forward-Backward algorithm)
 reg_param = 0.1
 iter_nb = 3000
 
 u,v = sparse.rand_plane(data_size)
 arr = np.empty((2,0), int)
-for reg_param in np.round(np.linspace(11,100,20),1):
+_, x_p = sparse.proj_plane(x0,u,v)
+arr = np.concatenate((x_p, arr), axis=1)
+for reg_param in np.round(np.linspace(11,100,90),1):
     if reg_param < 1:
         iter_nb=3000
     elif reg_param < 10:
@@ -46,9 +52,7 @@ plt.plot(arr[0,:],arr[1,:])
 plt.scatter(arr[0,:],arr[1,:],c=np.arange(arr.shape[1]))
 plt.show()
 
-x = np.random.random(10)
-y = np.random.random(10)
-c = np.arange(10)
+x = np.arange(10)
+np.save("lala", x)
 
-plt.scatter(x, y, c=c, s=500)
-plt.show()
+xx = np.load("lala.npy")
