@@ -31,7 +31,7 @@ iter_nb = 3000
 
 u,v = sparse.rand_plane(data_size)
 arr = np.empty((2,0), int)
-for reg_param in np.round(np.linspace(11,100,9),1):
+for reg_param in np.round(np.linspace(11,100,20),1):
     if reg_param < 1:
         iter_nb=3000
     elif reg_param < 10:
@@ -43,4 +43,12 @@ for reg_param in np.round(np.linspace(11,100,9),1):
     arr = np.concatenate((x_p, arr), axis=1)
 plt.figure(dpi=dpi)
 plt.plot(arr[0,:],arr[1,:])
+plt.scatter(arr[0,:],arr[1,:],c=np.arange(arr.shape[1]))
+plt.show()
+
+x = np.random.random(10)
+y = np.random.random(10)
+c = np.arange(10)
+
+plt.scatter(x, y, c=c, s=500)
 plt.show()
