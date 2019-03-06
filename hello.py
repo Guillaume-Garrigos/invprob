@@ -1,5 +1,4 @@
-# Rachel was here. And here again. Guillaume as well!
-# End of the party
+# First modification
 # last test
 N=6
 s=2
