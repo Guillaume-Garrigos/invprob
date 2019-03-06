@@ -1,4 +1,4 @@
-#Rachel was here
+#Rachel was here. Guillaume as well!
 N=6
 s=2
 
