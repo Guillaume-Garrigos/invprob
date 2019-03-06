@@ -1,4 +1,5 @@
 #Rachel was here. And here again. Guillaume as well!
+# End of the party
 N=6
 s=2
 
