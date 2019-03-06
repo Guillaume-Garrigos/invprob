@@ -1,3 +1,4 @@
+#Rachel was here
 N=6
 s=2
 
