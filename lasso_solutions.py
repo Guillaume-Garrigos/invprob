@@ -12,7 +12,7 @@ importlib.reload(fb)
 #########################################
 
 np.random.seed(seed=78) # Seed for np.random
-dpi = 100 # Resolution used for plotting (230 for small screen, 100 for large one)
+dpi = 230 # Resolution used for plotting (230 for small screen, 100 for large one)
 
 # We start by defining the characteristics of the problem: dimensions, sparsity level, etc.
 data_size = 100 
@@ -102,7 +102,7 @@ u,v = sparse.rand_plane(data_size)
 x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
 _, x_p = sparse.proj_plane(x_reg,u,v)
 arr = np.empty((2,0), int)
-
+arr = np.concatenate((x_p, arr), axis=1)
 
 
 for reg_param in np.round(np.linspace(11,100,9),1):
@@ -113,11 +113,10 @@ for reg_param in np.round(np.linspace(11,100,9),1):
     else:
         iter_nb = 200
     x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
-    _=plt.title(r"Regularisation parameter $\lambda=$"+str(reg_param))
-    sparse.stem(x0,"C0","ground truth")
-    sparse.stem(x_reg,"C1","reg solution")
-    plt.savefig('output/L1_reg/reg_sol_'+str(reg_param)+'.png',bbox_inches='tight')
-    plt.clf()
+    _, x_p = sparse.proj_plane(x_reg,u,v)
+    arr = np.concatenate((x_p, arr), axis=1)
 print("done")
 
-
+plt.figure(dpi=dpi)
+plt.plot(arr[0,:],arr[1,:])
+plt.show()
