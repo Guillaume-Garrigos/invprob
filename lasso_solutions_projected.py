@@ -29,15 +29,10 @@ _ = plt.figure(dpi=dpi)
 sparse.stem(x0,"C0","ground truth")
 plt.show()
 
-# Let's try to visualize the solution of the LASSO (computed with the Forward-Backward algorithm)
-reg_param = 0.1
-iter_nb = 3000
-
-u,v = sparse.rand_plane(data_size)
-arr = np.empty((2,0), int)
-_, x_p = sparse.proj_plane(x0,u,v)
-arr = np.concatenate((x_p, arr), axis=1)
-for reg_param in np.round(np.linspace(11,100,90),1):
+# Let's compute all the solution of the LASSO (computed with the Forward-Backward algorithm) for various values of reg_param
+arr = np.empty((data_size,0), int)
+arr = np.concatenate((x0, arr), axis=1)
+for reg_param in np.round(np.linspace(0.11,100,99),1):
     if reg_param < 1:
         iter_nb=3000
     elif reg_param < 10:
@@ -45,14 +40,18 @@ for reg_param in np.round(np.linspace(11,100,90),1):
     else:
         iter_nb = 200
     x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
-    _, x_p = sparse.proj_plane(x_reg,u,v)
-    arr = np.concatenate((x_p, arr), axis=1)
+    arr = np.concatenate((x_reg, arr), axis=1)
+#np.save("data_lasso_solutions", arr)
+
+# We display the regularization path (projected on a 2D space)
+u,v = sparse.rand_plane(data_size)
+arr_proj = np.empty((2,0), int)
+for i in np.arange(arr.shape[1]):
+    _, x_proj = sparse.proj_plane(arr[:,i],u,v)
+    arr_proj = np.concatenate((x_proj, arr_proj), axis=1)
+
 plt.figure(dpi=dpi)
-plt.plot(arr[0,:],arr[1,:])
-plt.scatter(arr[0,:],arr[1,:],c=np.arange(arr.shape[1]))
+plt.plot(arr_proj[0,:],arr_proj[1,:])
+plt.scatter(arr_proj[0,:],arr_proj[1,:],c=np.arange(arr_proj.shape[1]))
 plt.show()
 
-x = np.arange(10)
-np.save("lala", x)
-
-xx = np.load("lala.npy")
