@@ -34,8 +34,8 @@ sparse.stem(x_pinv,"C1","pinv solution")
 plt.show()
 
 # Let's compare the ground truth with the solution of the LASSO (computed with the Forward-Backward algorithm)
-reg_param = 0.1
-iter_nb = 3000
+reg_param = 0.01
+iter_nb = 30000
 
 x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
 _ = plt.figure(dpi=dpi)
