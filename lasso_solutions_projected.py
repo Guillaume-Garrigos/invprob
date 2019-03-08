@@ -5,49 +5,68 @@ import matplotlib.pyplot as plt
 import my_toolbox.sparsity as sparse 
 import my_toolbox.forwardbackward as fb
 
-###### This is for production only ######
-import importlib
-importlib.reload(sparse) 
-importlib.reload(fb) 
-#########################################
+
 np.random.seed(seed=78) # Seed for np.random
-dpi = 230 # Resolution used for plotting (230 for small screen, 100 for large one)
+dpi = 100 # Resolution used for plotting (230 for small screen, 100 for large one)
+plt.ion()
 
 # We start by defining the characteristics of the problem: dimensions, sparsity level, etc.
 data_size = 100 
 data_number = round(data_size/2)
 sparsity_level = 10
-noise_level = 0.001*0
 
 # We define the main components of our problem
 Phi = np.random.randn(data_number,data_size)
 x0 = np.sign(sparse.randn(data_size,1,sparsity_level))
-noise = noise_level * np.random.randn(data_number,1)
-y = Phi@x0 + noise
+P_rand = sparse.rand_plane(data_size) # A random plane onto which we'll project the data
 
-# Let's compute all the solution of the LASSO (computed with the Forward-Backward algorithm) for various values of reg_param
-sol_list = np.empty((data_size,0), int)
-for reg_param in np.round(np.linspace(0.01,1,99),2):
-    if reg_param < 0.1:
-        iter_nb=40000
-    elif reg_param < 1:
-        iter_nb=4000
-    elif reg_param < 10:
-        iter_nb = 1000
-    else:
-        iter_nb = 200
-    x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
-    sol_list = np.concatenate((x_reg, sol_list), axis=1)
-#np.save("data_lasso_solutions", arr)
-#arr = np.load("data_lasso_solutions.npy")
+# We do a function which computes the regularization path 
+def compute_reg_path(Phi, x0, noise_level, regp_min, regp_max, regp_number):
+    y = Phi@x0 + noise_level * np.random.randn(Phi.shape[0],1)
+    reg_path = np.empty((Phi.shape[1],0), int)
+    for reg_param in np.round(np.logspace(regp_min,regp_max,regp_number),3):
+        if reg_param < 0.1:
+            iter_nb=30000
+        elif reg_param < 1:
+            iter_nb=4000
+        elif reg_param < 10:
+            iter_nb = 1000
+        else:
+            iter_nb = 200
+        x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
+        reg_path = np.concatenate((x_reg, reg_path), axis=1)
+    return reg_path
+
+
+# Let's compute the regularization path for no noise
+noise_level=0
+reg_path = compute_reg_path(Phi, x0, noise_level, regp_min=-2, regp_max=2, regp_number=100)
+reg_path_proj = P_rand @ reg_path
+x0_proj = P_rand@x0
+
+plt.figure(dpi=dpi)
+#plt.plot(reg_path_proj[0,:],reg_path_proj[1,:])
+plt.scatter(reg_path_proj[0,:], reg_path_proj[1,:], c=range(reg_path_proj.shape[1]), vmin=0, vmax=20,  s=35, cmap=plt.cm.get_cmap('RdYlBu'))
+sc = plt.scatter(x0_proj[0],x0_proj[1],c='r',marker='x',s=500)
+plt.colorbar(sc)
+plt.show()
+
+plt.figure(dpi=dpi)
+cm = plt.cm.get_cmap('RdYlBu')
+x = reg_path_proj[0,:]
+y = reg_path_proj[1,:]
+z = range(reg_path_proj.shape[1])
+sc = plt.scatter(x, y, c=z, vmin=0, vmax=100, s=35, cmap=cm)
+plt.colorbar(sc)
+plt.show()
 
 # We display the regularization path (projected on a 2D space)
-u,v = sparse.rand_plane(data_size)
 _, x0_proj = sparse.proj_plane(x0,u,v)
 arr_proj = np.empty((2,0), int)
-for i in np.arange(sol_list.shape[1]):
-    _, x_proj = sparse.proj_plane(sol_list[:,i],u,v)
+for i in np.arange(reg_path.shape[1]):
+    _, x_proj = sparse.proj_plane(reg_path[:,i],u,v)
     arr_proj = np.concatenate((x_proj, arr_proj), axis=1)
+    print(arr_proj.shape)
 
 plt.figure(dpi=dpi)
 plt.plot(arr_proj[0,:],arr_proj[1,:])
