@@ -31,13 +31,14 @@ def stem(signal,color="C0",label=None):
     return 
 
 def rand_plane(N):
-    # Returns two orthonormal random vectors in R^N
+    # Returns a matrix P which is composed of two orthonormal random vectors in R^N
+    # Applying P to x will project x onto the plane spanned by these two vectors
     x = np.random.randn(N,1)
     y = np.random.randn(N,1)
     y = y / la.norm(y) # normalize y
     x = x - x.T@y * y # project x onto Vect(y)
     x = x / la.norm(x) # normalize x
-    return x, y
+    return np.concatenate((x.T,y.T), axis = 0)
 
 def proj_plane(x,u,v):
     # Given a plane spanned by two orthonormal vectors u,v
