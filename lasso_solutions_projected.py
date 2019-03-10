@@ -23,6 +23,7 @@ P_rand = sparse.rand_plane(data_size) # A random plane onto which we'll project 
 # We do functions which computes and display the regularization path 
 def compute_reg_path(Phi, y, reg_param_grid):
     reg_path = np.empty((Phi.shape[1],0), int)
+    x_ini = np.zeros( (Phi.shape[1],1) )
     for reg_param in reg_param_grid:
         # We choose the number of iterations to do depending on the reg_param. This is a completely custom choice, it seems to work quite well on random problems.
         if reg_param < 0.1:
@@ -33,14 +34,16 @@ def compute_reg_path(Phi, y, reg_param_grid):
             iter_nb = 1000
         else:
             iter_nb = 200
-        x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
+        # We use a warm restart approach: for each problem we use the solution of the previous problem as a starting point
+        x_reg = fb.lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
+        x_ini = x_reg
         reg_path = np.concatenate((reg_path,x_reg), axis=1)
     return reg_path
 
 def scatter_reg_path(path,limit=None,title=None):
     cm = plt.cm.get_cmap('RdYlBu')
     if limit is not None:
-        plt.scatter(limit[0],limit[1],c='r',marker='x',s=150)
+        plt.scatter(limit[0,:],limit[1,:],c='r',marker='x',s=150)
     if title is not None:
         _ = plt.title(title)
     plt.plot(path[0,:],path[1,:], c='black',linewidth=0.5)
@@ -50,7 +53,7 @@ def scatter_reg_path(path,limit=None,title=None):
 # We put a grid on the reg_param, by taking them on a log scale and decreasing order
 regp_min=-2
 regp_max=2
-regp_number=20
+regp_number=100
 reg_param_grid = np.round(np.logspace(regp_min,regp_max,regp_number),3)[::-1]
 
 # Let's compute the regularization path for various values of noise
@@ -82,19 +85,23 @@ plt.show()
 def reg_param_selection(path,ground_truth):
     # Given a regularization path and a ground truth, returns the best regularized solution (in L2 sense)
     path_length = path.shape[1]
-    reg_sol = path[:,0]
+    path_dimension = path.shape[0]
+    reg_sol = path[:,0].reshape(path_dimension, 1)
     reg_param_index = 0
     for k in np.arange(path_length):
-        if la.norm(ground_truth.T - path[:,k],1) < la.norm(ground_truth.T - reg_sol,1):
-            reg_sol = path[:,k]
+        print(la.norm(ground_truth.T - path[:,k]))
+        if la.norm(ground_truth.T - path[:,k]) < la.norm(ground_truth.T - reg_sol):
+            reg_sol = path[:,k].reshape(path_dimension, 1)
             reg_param_index = k
     return reg_sol, reg_param_index
 
+# We compute the best parameter given the ground truth
 reg_sol, reg_param_index = reg_param_selection(reg_path,x0)
 reg_sol_2, reg_param_index_2 = reg_param_selection(reg_path_2,x0)
 reg_sol_1, reg_param_index_1 = reg_param_selection(reg_path_1,x0)
 reg_sol_0, reg_param_index_0 = reg_param_selection(reg_path_0,x0)
 
+# We represent the selected solutions
 _ = plt.figure(dpi=dpi)
 plt.subplot(2, 2, 1)
 sparse.stem(x0,"C0","ground truth")
@@ -114,7 +121,17 @@ sparse.stem(reg_sol_0,"C1","reg solution")
 plt.title("$\sigma=1$")
 plt.show()
 
-
+plt.figure(dpi=dpi)
+plt.subplot(2, 2, 1)
+scatter_reg_path(P_svd@reg_path,limit=P_svd@x0,title="$\sigma$=0, $\lambda$="+str(reg_param_grid[reg_param_index]))
+plt.subplot(2, 2, 2)
+scatter_reg_path(P_svd@reg_path_2,limit=P_svd@x0,title="$\sigma$=0.01, $\lambda$="+str(reg_param_grid[reg_param_index_2]))
+plt.subplot(2, 2, 3)
+scatter_reg_path(P_svd@reg_path_1,limit=P_svd@x0,title="$\sigma$=0.1, $\lambda$="+str(reg_param_grid[reg_param_index_1]))
+plt.subplot(2, 2, 4)
+scatter_reg_path(P_svd@reg_path_0,title="$\sigma$=1, $\lambda$="+str(reg_param_grid[reg_param_index_0]),\
+    limit=np.concatenate((P_svd@x0,P_svd@reg_sol_0), axis=1))
+plt.show()
 
 
 
