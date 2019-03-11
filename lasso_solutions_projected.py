@@ -52,7 +52,7 @@ def compute_reg_path(Phi, y, reg_param_grid):
         reg_path = np.concatenate((reg_path, x_reg), axis=1)
     return reg_path
 
-if os.path.isfile(folder + 'reg_path_example.npy'):
+if os.path.isfile(folder + 'reg_path_examples.npy'):
     reg_path_examples = np.load(folder + 'reg_path_examples.npy')
     reg_path = reg_path_examples[:, :, 0]
     reg_path_2 = reg_path_examples[:, :, 1]
@@ -120,10 +120,6 @@ def get_pca_projector(data):
     _, vectors = la.eig(V)
     return np.real(vectors[:, 0:2]).T
 
-P_svd = get_pca_projector(reg_path_0)
-# Alternative: just using a random projection
-# P_rand = sparse.rand_plane(data_size)
-
 
 def scatter_reg_path(path, limit=None, title=None):
     cm = plt.cm.get_cmap('RdBu')
@@ -136,6 +132,9 @@ def scatter_reg_path(path, limit=None, title=None):
                       vmin=0, vmax=path.shape[1], s=35, cmap=cm)
     plt.colorbar(fig)
 
+P_svd = get_pca_projector(reg_path_0)
+# Alternative: just using a random projection
+# P_rand = sparse.rand_plane(data_size)
 
 plt.figure(dpi=dpi)
 plt.subplot(2, 2, 1)
