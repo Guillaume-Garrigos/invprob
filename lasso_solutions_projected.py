@@ -124,6 +124,19 @@ P_svd = get_pca_projector(reg_path_0)
 # Alternative: just using a random projection
 # P_rand = sparse.rand_plane(data_size)
 
+
+def scatter_reg_path(path, limit=None, title=None):
+    cm = plt.cm.get_cmap('RdBu')
+    if limit is not None:
+        plt.scatter(limit[0, :], limit[1, :], c='r', marker='x', s=150)
+    if title is not None:
+        _ = plt.title(title)
+    plt.plot(path[0, :], path[1, :], c='black', linewidth=0.5)
+    fig = plt.scatter(path[0, :], path[1, :], c=range(path.shape[1]),
+                      vmin=0, vmax=path.shape[1], s=35, cmap=cm)
+    plt.colorbar(fig)
+
+
 plt.figure(dpi=dpi)
 plt.subplot(2, 2, 1)
 scatter_reg_path(P_svd@reg_path,
