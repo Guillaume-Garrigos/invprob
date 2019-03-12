@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import linalg as la
-
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 def randn(N, M, s):
     # Returns a (N,M) sparse array
@@ -21,18 +22,47 @@ def norm0(x):
     return np.sum(abs(x) > 1e-15)
 
 
-def stem(signal, color="C0", label=None):
+def stem(signal, color="C0", label=None, verbose=False, title=None):
     # plots a sparse 1D signal with stem but removes zero components
     # color and label are strings standing for the color and label
     import matplotlib.pyplot as plt
     x = signal.copy()  # Prevents modification of the signal
     x[x == 0] = np.nan
-    (markerline, stemlines, _) = plt.stem(x, label=label)
+    markerline, stemlines, baseline = plt.stem(x, label=label)
     _ = plt.setp(markerline, color=color)
     _ = plt.setp(stemlines, color=color)
     if label is not None:
         plt.legend()
-    return
+    if title is not None:
+        plt.title()
+    if verbose is False:
+        return
+    else:
+        return markerline, stemlines, baseline
+
+
+def save_stem_gif(limit, path, param_grid, file_name, title_grid):
+    # Given a path of parametrised signals, plot all of them successively
+    # and gather them in an animated gif which is saved as name.gif
+    path_length = path.shape[1]
+    fig = plt.gcf()
+
+    def update(i):
+        # animation function. This is called sequentially
+        print(f"\r Creating an animated picture ... Step {i+1}/{path_length} ...", end="")
+        plt.cla()
+        x_reg = path[:, i, None]
+        stem(limit, "C0")
+        stem(x_reg, "C1")
+        plt.title(title_grid[i])
+        if i+1 == path_length:
+            print("\n")
+
+    anim = FuncAnimation(fig, update, np.arange(path_length), interval=200)
+    anim.save(file_name + '.gif', writer='imagemagick')
+    anim.event_source.stop()
+    plt.close()
+    del anim
 
 
 def rand_plane(N):

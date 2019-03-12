@@ -1,7 +1,8 @@
-
+import os.path
 import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import my_toolbox.sparsity as sparse
 import my_toolbox.forwardbackward as fb
 
@@ -13,7 +14,9 @@ importlib.reload(fb)
 #########################################
 
 np.random.seed(seed=78)  # Seed for np.random
-dpi = 230  # Resolution for plotting (230 for small screen, 100 for large one)
+dpi = 100  # Resolution for plotting (230 for small screen, 100 for large one)
+plt.ion()
+folder = "output/L1_reg/"
 
 # We start by defining the characteristics of the problem
 data_size = 100
@@ -55,9 +58,60 @@ plt.title(r"Evolution of supp$(x_n)$")
 plt.plot(details.get("iterate_support"))
 plt.show()
 
-# Now we generate and save images corresponding to
-# the regularized solutions for various values for reg_param
+# Now we generate the regularization path
 # Quite expensive in time depending on the parameters!
+def compute_reg_path(Phi, y, reg_param_grid):
+    print("Computing the regularization path")
+    reg_path = np.empty((Phi.shape[1], 0), int)
+    x_ini = np.zeros((Phi.shape[1], 1))
+    for reg_param in reg_param_grid:
+        ''' We choose the number of iterations to do depending on the reg_param.
+        This is a completely custom choice, it seems to work quite well
+        on random problems.
+        '''
+        if reg_param < 0.1:
+            iter_nb = 40000
+        elif reg_param < 1:
+            iter_nb = 4000
+        elif reg_param < 10:
+            iter_nb = 1000
+        else:
+            iter_nb = 200
+        # We use a warm restart approach:
+        # for each problem we use the solution of the previous problem
+        # as a starting point
+        x_reg = fb.lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
+        x_ini = x_reg
+        reg_path = np.concatenate((reg_path, x_reg), axis=1)
+    return reg_path
+
+regp_min = -2
+regp_max = 2
+regp_number = 5
+reg_param_grid = np.round(np.logspace(regp_min, regp_max, regp_number), 3)[::-1]
+
+if os.path.isfile(folder + 'reg_path_noiseless.npy'):
+    reg_path = np.load(folder + 'reg_path_noiseless.npy')
+    if reg_path.shape[1] != regp_number:  # Previous but different experiment
+        reg_path = compute_reg_path(Phi, y, reg_param_grid)
+        np.save(folder + 'reg_path_noiseless.npy', reg_path)
+else:
+    reg_path = compute_reg_path(Phi, y, reg_param_grid)
+    np.save(folder + 'reg_path_noiseless.npy', reg_path)
+
+# We save the reg path as many image files and an animated gif
+plt.ioff()
+plt.figure(dpi=dpi)
+file_name = folder + 'reg_path_noiseless'
+title_grid = [r"Ground truth $x_0$ vs regularised solution $x_\lambda$ " + \
+              "for $\lambda$=" + str(param) for param in reg_param_grid]
+options = {"animation": True, "frames": False}
+sparse.save_stem_gif(x0, reg_path, reg_param_grid, file_name, title_grid)
+
+
+
+
+
 _ = plt.figure(dpi=dpi)
 for reg_param in np.round(np.linspace(10.1, 100, 900), 1):
     x_reg = fb.lasso(Phi, y, reg_param, iter_nb=200)
