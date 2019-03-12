@@ -2,8 +2,8 @@ import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
 import os.path
-import my_toolbox.sparsity as sparse
-import my_toolbox.forwardbackward as fb
+import invprob.sparse as sparse
+from invprob.optim import fb_lasso
 
 np.random.seed(seed=74)  # Seed for np.random (78)
 dpi = 230  # Resolution for plotting (230 for small screen, 100 for large one)
@@ -47,7 +47,7 @@ def compute_reg_path(Phi, y, reg_param_grid):
         # We use a warm restart approach:
         # for each problem we use the solution of the previous problem
         # as a starting point
-        x_reg = fb.lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
+        x_reg = fb_lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
         x_ini = x_reg
         reg_path = np.concatenate((reg_path, x_reg), axis=1)
     return reg_path

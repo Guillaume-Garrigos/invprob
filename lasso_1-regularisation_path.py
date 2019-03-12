@@ -2,9 +2,8 @@ import os.path
 import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import my_toolbox.sparsity as sparse
-import my_toolbox.forwardbackward as fb
+import invprob.sparse as sparse
+from invprob.optim import fb_lasso
 
 #########################################
 # This is for production only
@@ -42,14 +41,14 @@ plt.show()
 reg_param = 0.01
 iter_nb = 40000
 
-x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
+x_reg = fb_lasso(Phi, y, reg_param, iter_nb)
 _ = plt.figure(dpi=dpi)
 sparse.stem(x0, "C0", "ground truth")
 sparse.stem(x_reg, "C1", "reg solution")
 plt.show()
 
 # We look at what happens during the iterations of the algorithm
-x_reg, details = fb.lasso(Phi, y, reg_param, iter_nb, verbose=True)
+x_reg, details = fb_lasso(Phi, y, reg_param, iter_nb, verbose=True)
 plt.figure(dpi=dpi)
 plt.title(r"Evolution of $f(x_n)$")
 plt.plot(details.get("function_value"))
@@ -80,7 +79,7 @@ def compute_reg_path(Phi, y, reg_param_grid):
         # We use a warm restart approach:
         # for each problem we use the solution of the previous problem
         # as a starting point
-        x_reg = fb.lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
+        x_reg = fb_lasso(Phi, y, reg_param, iter_nb, x_ini=x_ini)
         x_ini = x_reg
         reg_path = np.concatenate((reg_path, x_reg), axis=1)
     return reg_path
