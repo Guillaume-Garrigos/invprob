@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import os
 
+def temp_func()
+    print("coucou")
+
 def randn(N, M, s):
     # Returns a (N,M) sparse array
     # It has 's' nonzero components, sampled from a gaussian distribution
