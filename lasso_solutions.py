@@ -87,7 +87,7 @@ def compute_reg_path(Phi, y, reg_param_grid):
 
 regp_min = -2
 regp_max = 2
-regp_number = 5
+regp_number = 200
 reg_param_grid = np.round(np.logspace(regp_min, regp_max, regp_number), 3)[::-1]
 
 if os.path.isfile(folder + 'reg_path_noiseless.npy'):
@@ -99,61 +99,21 @@ else:
     reg_path = compute_reg_path(Phi, y, reg_param_grid)
     np.save(folder + 'reg_path_noiseless.npy', reg_path)
 
-# We save the reg path as many image files and an animated gif
+# We save the reg path as many image files and as an animated gif
+# This is the name under which we save the data
+file_name = folder + 'reg_path_noiseless'
+# We concatenate conveniently x0 and reg_path in such a way that for every frame
+# we plot two signals: x0 and reg_path[param]
+paths = np.stack((np.repeat(x0, regp_number, axis=1), reg_path),
+                 axis=2)
+# We chose a title for every frame we'll plot
+title_grid = [r"Ground truth $x_0$ vs regularised solution $x_\lambda$ " +
+              "for $\lambda$=" + str(param) for param in reg_param_grid]
+
 plt.ioff()
 plt.figure(dpi=dpi)
-file_name = folder + 'reg_path_noiseless'
-title_grid = [r"Ground truth $x_0$ vs regularised solution $x_\lambda$ " + \
-              "for $\lambda$=" + str(param) for param in reg_param_grid]
-options = {"animation": True, "frames": False}
-sparse.save_stem_gif(x0, reg_path, reg_param_grid, file_name, title_grid)
-
-
-
-
-
-_ = plt.figure(dpi=dpi)
-for reg_param in np.round(np.linspace(10.1, 100, 900), 1):
-    x_reg = fb.lasso(Phi, y, reg_param, iter_nb=200)
-    _ = plt.title(r"Regularisation parameter $\lambda=$" + str(reg_param))
-    sparse.stem(x0, "C0", "ground truth")
-    sparse.stem(x_reg, "C1", "reg solution")
-    plt.savefig('output/L1_reg/reg_sol_' + str(reg_param) + '.png',
-                bbox_inches='tight')
-    plt.clf()
-print("done")
-for reg_param in np.round(np.linspace(1.1, 10, 90), 1):
-    x_reg = fb.lasso(Phi, y, reg_param, iter_nb=1000)
-    _ = plt.title(r"Regularisation parameter $\lambda=$" + str(reg_param))
-    sparse.stem(x0, "C0", "ground truth")
-    sparse.stem(x_reg, "C1", "reg solution")
-    plt.savefig('output/L1_reg/reg_sol_' + str(reg_param) + '.png',
-                bbox_inches='tight')
-    plt.clf()
-print("done")
-for reg_param in np.round(np.linspace(0.11, 1, 9), 1):
-    x_reg = fb.lasso(Phi, y, reg_param, iter_nb=3000)
-    _ = plt.title(r"Regularisation parameter $\lambda=$" + str(reg_param))
-    sparse.stem(x0, "C0", "ground truth")
-    sparse.stem(x_reg, "C1", "reg solution")
-    plt.savefig('output/L1_reg/reg_sol_' + str(reg_param) + '.png',
-                bbox_inches='tight')
-    plt.clf()
-print("done")
-
-# Super super expensive
-for reg_param in np.round(np.linspace(0.11, 100, 999), 1):
-    if reg_param < 1:
-        iter_nb = 3000
-    elif reg_param < 10:
-        iter_nb = 1000
-    else:
-        iter_nb = 200
-    x_reg = fb.lasso(Phi, y, reg_param, iter_nb)
-    _ = plt.title(r"Regularisation parameter $\lambda=$" + str(reg_param))
-    sparse.stem(x0, "C0", "ground truth")
-    sparse.stem(x_reg, "C1", "reg solution")
-    plt.savefig('output/L1_reg/reg_sol_' + str(reg_param) + '.png',
-                bbox_inches='tight')
-    plt.clf()
-print("done")
+options = {"animation": True,  # What we wanna save and how
+           "frames": True,
+           "interval": 100,
+           "file_name": file_name}
+sparse.save_stem_gif(paths, reg_param_grid, title_grid, options)

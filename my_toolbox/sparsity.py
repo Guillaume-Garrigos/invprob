@@ -2,6 +2,7 @@ import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import os
 
 def randn(N, M, s):
     # Returns a (N,M) sparse array
@@ -41,28 +42,50 @@ def stem(signal, color="C0", label=None, verbose=False, title=None):
         return markerline, stemlines, baseline
 
 
-def save_stem_gif(limit, path, param_grid, file_name, title_grid):
-    # Given a path of parametrised signals, plot all of them successively
-    # and gather them in an animated gif which is saved as name.gif
-    path_length = path.shape[1]
+def save_stem_gif(paths, param_grid, title_grid, options):
+    # Given path(s) of parametrised signals, plot all of them successively
+    # Eventually all the plots are saved as a series of .png and/or a .gif
     fig = plt.gcf()
+    file_name = options["file_name"]
+    path_length = paths.shape[1]
+    if paths.ndim == 3:
+        path_number = paths.shape[2]
 
     def update(i):
         # animation function. This is called sequentially
-        print(f"\r Creating an animated picture ... Step {i+1}/{path_length} ...", end="")
+        print(f"\r Creating a series of frames ... Step {i+1}/{path_length}",
+              end="")
         plt.cla()
-        x_reg = path[:, i, None]
-        stem(limit, "C0")
-        stem(x_reg, "C1")
+        if paths.ndim == 2:
+            x = paths[:, i, None]
+            stem(x, "C0")
+        else:  # we do the same but looping on the number of signals to plot
+            for k in np.arange(path_number):
+                x = paths[:, i, k, None]
+                col = "C" + str(k)
+                stem(x, col)
         plt.title(title_grid[i])
         if i+1 == path_length:
             print("\n")
+        return
 
-    anim = FuncAnimation(fig, update, np.arange(path_length), interval=200)
-    anim.save(file_name + '.gif', writer='imagemagick')
-    anim.event_source.stop()
-    plt.close()
-    del anim
+    if options["animation"] is True:
+        anim = FuncAnimation(fig, update,
+                             np.arange(path_length),
+                             interval=options["interval"])
+        anim.save(file_name + '.gif', writer='imagemagick')
+        anim.event_source.stop()
+        plt.close()
+        del anim
+    if options["frames"] is True:
+        if not os.path.exists(file_name):
+            os.makedirs(file_name)
+        for k in np.arange(path_length):
+            update(k)
+            plt.savefig(file_name + '/' + str(param_grid[k]) + '.png',
+                        bbox_inches='tight')
+    return
+
 
 
 def rand_plane(N):
