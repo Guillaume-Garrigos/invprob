@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 import os
 
 def temp_func():
-    print("coucou")
+    print("coucou!")
 
 def randn(N, M, s):
     # Returns a (N,M) sparse array
