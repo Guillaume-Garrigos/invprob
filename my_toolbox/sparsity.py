@@ -7,16 +7,16 @@ import os
 def randn(N, M, s):
     # Returns a (N,M) sparse array
     # It has 's' nonzero components, sampled from a gaussian distribution
-    x = np.random.randn(N*M)
-    index = np.random.permutation(N*M)
-    index = index[0:N*M-s]
+    x = np.random.randn(N * M)
+    index = np.random.permutation(N * M)
+    index = index[0: N * M - s]
     x[np.ix_(index)] *= 0
     x = x.reshape((N, M))
     return x
 
 
 def soft_thresholding(x, t):
-    return np.sign(x)*np.maximum(0, abs(x)-t)
+    return np.sign(x) * np.maximum(0, abs(x) - t)
 
 
 def norm0(x):
@@ -65,7 +65,7 @@ def save_stem_gif(paths, param_grid, title_grid, options):
                 col = "C" + str(k)
                 stem(x, col)
         plt.title(title_grid[i])
-        if i+1 == path_length:
+        if i + 1 == path_length:
             print("\n")
         return
 
