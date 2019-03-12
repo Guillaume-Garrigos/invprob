@@ -112,8 +112,8 @@ title_grid = [r"Ground truth $x_0$ vs regularised solution $x_\lambda$ " +
 
 plt.ioff()
 plt.figure(dpi=dpi)
-options = {"animation": True,  # What we wanna save and how
-           "frames": True,
+options = {"animation": False,  # What we wanna save and how
+           "frames": False,
            "interval": 100,
            "file_name": file_name}
 sparse.save_stem_gif(paths, reg_param_grid, title_grid, options)
