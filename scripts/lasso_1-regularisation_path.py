@@ -2,6 +2,9 @@ import os.path
 import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
+
+import sys
+sys.path.append('..')
 import invprob.sparse as sparse
 from invprob.optim import fb_lasso
 
@@ -15,7 +18,7 @@ importlib.reload(fb)
 np.random.seed(seed=78)  # Seed for np.random
 dpi = 100  # Resolution for plotting (230 for small screen, 100 for large one)
 plt.ion()
-folder = "output/L1_reg/"
+folder = "scripts/../output/L1_reg/"
 
 # We start by defining the characteristics of the problem
 data_size = 100
