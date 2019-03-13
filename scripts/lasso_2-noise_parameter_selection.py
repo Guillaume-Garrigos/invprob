@@ -8,7 +8,7 @@ sys.path.append('..')
 import invprob.sparse as sparse
 from invprob.optim import fb_lasso
 
-np.random.seed(seed=74)  # Seed for np.random (78)
+np.random.seed(seed=78)  # Seed for np.random (78)
 dpi = 230  # Resolution for plotting (230 for small screen, 100 for large one)
 plt.ion()
 folder = "scripts/../output/L1_reg/"
@@ -165,31 +165,29 @@ plt.show()
 # Now we try to catch what is the rate of convergence, which is
 # the value of norm(x0 - x_lambda) and lambda when the noise goes to zero.
 batch_nb = 20
-noise_level_grid = np.round(np.logspace(-2, 0, batch_nb), 3)
+noise_level_grid = np.round(np.logspace(-2, 0, batch_nb), 3).reshape(batch_nb, 1)
 
 if os.path.isfile(folder + 'reg_path_rates_examples.npy'):
     import_data = np.load(folder + 'reg_path_rates_examples.npy')
-    noise_level_grid = import_data[:, :, 0].T
-    param_value = import_data[:, :, 1].T
-    dist_to_truth = import_data[:, :, 2].T
+    noise_level_grid = import_data[:, :, 0]
+    param_value = import_data[:, :, 1]
+    dist_to_truth = import_data[:, :, 2]
 else:
     # We run a heavy computation
-    param_value = np.empty([batch_nb, 1], dtype=int)
+    param_value = np.empty([batch_nb, 1])
     dist_to_truth = np.zeros((batch_nb, 1))
-
     for k in np.arange(batch_nb):
+        print(k)
         reg_path_temp = compute_reg_path(Phi,
                                          y + noise_level_grid[k] * noisy_vector,
                                          reg_param_grid)
         reg_sol_temp, reg_param_index_temp = reg_param_selection(reg_path_temp, x0)
         param_value[k] = reg_param_grid[reg_param_index_temp]
         dist_to_truth[k] = la.norm(reg_sol_temp - x0)
-
     reg_path_rates_examples = np.dstack((noise_level_grid,
                                         param_value,
                                         dist_to_truth))
-    np.save(folder + 'reg_path_rates_examples.npy',
-            reg_path_rates_examples)
+    np.save(folder + 'reg_path_rates_examples.npy', reg_path_rates_examples)
 
 plt.figure(dpi=dpi)
 plt.title(r"Evolution of $\lambda(\sigma)$ in function of $\sigma$")
