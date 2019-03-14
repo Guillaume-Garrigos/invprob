@@ -4,7 +4,7 @@
     "python.linting.pylintEnabled": false,
     "python.linting.pep8Enabled": true,
     "python.linting.enabled": true,
-    "python.linting.pep8Args": ["--ignore=E303,E501,E302"],
+    "python.linting.pep8Args": ["--ignore=E303,E501,E302,E402"],
     "[python]": {
         "editor.rulers": [
             80,

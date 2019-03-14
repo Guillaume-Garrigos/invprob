@@ -177,7 +177,7 @@ else:
     param_value = np.empty([batch_nb, 1])
     dist_to_truth = np.zeros((batch_nb, 1))
     for k in np.arange(batch_nb):
-        print(k)
+        print("Compute the regularisation path "+str(k+1)+" over "+str(batch_nb))
         reg_path_temp = compute_reg_path(Phi,
                                          y + noise_level_grid[k] * noisy_vector,
                                          reg_param_grid)
