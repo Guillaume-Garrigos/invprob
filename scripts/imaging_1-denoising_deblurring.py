@@ -59,7 +59,14 @@ _ = plt.figure(dpi=dpi)
 _ = plt.imshow(imww, cmap="gray")
 
 # We add some noise
-im_noise = random_noise(im, mode="gaussian")
+im_noise = random_noise(im, mode="gaussian", seed=seed, var=0.1)
 _ = plt.figure(dpi=dpi)
 _ = plt.imshow(im_noise, cmap="gray")
 
+im_noise = random_noise(im, mode="s&p", seed=seed, amount=0.35)
+_ = plt.figure(dpi=dpi)
+_ = plt.imshow(im_noise, cmap="gray")
+
+im_noise = random_noise(im, mode="poisson", seed=seed)
+_ = plt.figure(dpi=dpi)
+_ = plt.imshow(im_noise, cmap="gray")
