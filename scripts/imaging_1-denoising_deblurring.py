@@ -2,28 +2,32 @@ import numpy as np
 from numpy import linalg as la
 import matplotlib.pyplot as plt
 from pylab import fft2, ifft2
+from skimage.io import imread
+from skimage.util import random_noise
+from skimage.util.dtype import img_as_float
 
 import sys
 sys.path.append('..')
 
 from invprob import wavelet
-from invprob import signal
+# from invprob import signal
 
 #########################################
 # This is for production only
 import importlib
 importlib.reload(wavelet)
 #########################################
-
-np.random.seed(seed=78)  # Seed for np.random
+seed = 78  # Seed for random events
+np.random.seed(seed=seed)
 dpi = 100  # Resolution for plotting (230 for small screen, 100 for large one)
 plt.ion()
 data_repo = "scripts/../data/images/"
 
 # We can blur images
-im = signal.load_image(data_repo + 'comete.png')
+# comete = signal.load_image(data_repo + 'comete.png')
+im = img_as_float(imread(data_repo + 'comete.png'))
 _ = plt.figure(dpi=dpi)
-_ = plt.imshow(im, cmap="gray")
+_ = plt.imshow(comete, cmap="gray")
 
 
 def create_kernel(kernel_width, im_size):
@@ -53,4 +57,9 @@ _ = wavelet.plot_coeff(imw)
 imww = wavelet.inverse_transform(imw)
 _ = plt.figure(dpi=dpi)
 _ = plt.imshow(imww, cmap="gray")
+
+# We add some noise
+im_noise = random_noise(im, mode="gaussian")
+_ = plt.figure(dpi=dpi)
+_ = plt.imshow(im_noise, cmap="gray")
 
