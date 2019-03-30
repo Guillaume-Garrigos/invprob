@@ -54,7 +54,7 @@ _ = plt.imshow(imb, cmap="gray")
 
 # Replace fft with dct
 def dct2(image):
-  return dct(dct(image.T, norm='ortho').T, norm='ortho')
+    return dct(dct(image.T, norm='ortho').T, norm='ortho')
 
 def idct2(coefficient):
     return idct(idct(coefficient.T, norm='ortho').T, norm='ortho')
