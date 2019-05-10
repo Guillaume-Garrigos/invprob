@@ -13,7 +13,6 @@ def fb_lasso(A, y, reg_param, iter_nb, x_ini=None, verbose=False):
     '''
     # Manage optional input/output
     if verbose:  # Optional output
-        print("new")
         regret = np.zeros(iter_nb)
         support = np.zeros(iter_nb)
         path = np.zeros((A.shape[1], iter_nb))
@@ -28,7 +27,7 @@ def fb_lasso(A, y, reg_param, iter_nb, x_ini=None, verbose=False):
 
 
     # The core of the algorithm
-    stepsize = 0.8 * 2 / (la.norm(A, 2)**2)
+    stepsize = 0.5 * 2 / (la.norm(A, 2)**2)
     for k in range(iter_nb):
         x = x - stepsize * A.T@(A@x - y)
         x = sparse.soft_thresholding(x, param[k] * stepsize)
