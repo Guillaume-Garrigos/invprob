@@ -9,7 +9,7 @@ from invprob.optim import fb_lasso
 
 
 np.random.seed(seed=74)  # Seed for np.random (74)
-dpi = 100  # Resolution for plotting (230 for small screen, 100 for large one)
+dpi = 230  # Resolution for plotting (230 for small screen, 100 for large one)
 plt.ion()
 folder = "scripts/../output/L1_reg/"
 
@@ -51,13 +51,13 @@ def reg_param_selection(path, ground_truth):
 
 
 # We solve the noisy problem
-y = Phi@x0 + 0.5 * noisy_vector
-iter_nb = 100000
+y = Phi@x0 + 0.01 * noisy_vector
+iter_nb = 1000
 exp_decay = 0.1  # The smaller the exponent, the faster is the algorithm
 reg_param_grid = 1 / (np.arange(iter_nb)+1)**exp_decay
 
 x_sol2 = fb_lasso(Phi, y, 0.001, iter_nb=100000)
-x_reg2 = fb_lasso(Phi, y, 0.87, iter_nb=10000)
+x_reg2 = fb_lasso(Phi, y, 0.87, iter_nb=200)
 
 x_sol, details = fb_lasso(Phi, y, reg_param_grid, iter_nb, verbose=True)
 reg_path = details["iterate_path"]
