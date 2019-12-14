@@ -27,10 +27,9 @@ def norm0(x):
 def stem(signal, color="C0", label=None, verbose=False, title=None):
     # plots a sparse 1D signal with stem but removes zero components
     # color and label are strings standing for the color and label
-    import matplotlib.pyplot as plt
     x = signal.copy()  # Prevents modification of the signal
     x[x == 0] = np.nan
-    markerline, stemlines, baseline = plt.stem(x, label=label)
+    markerline, stemlines, baseline = plt.stem(x, label=label, use_line_collection=True)
     _ = plt.setp(markerline, color=color)
     _ = plt.setp(stemlines, color=color)
     if label is not None:
