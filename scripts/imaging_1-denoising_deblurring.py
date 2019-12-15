@@ -21,7 +21,7 @@ importlib.reload(wavelet)
 #########################################
 seed = 78  # Seed for random events
 np.random.seed(seed=seed)
-dpi = 230  # Resolution for plotting (230 for small screen, 100 for large one)
+dpi = 100  # Resolution for plotting (230 for small screen, 100 for large one)
 plt.ion()
 data_repo = "scripts/../data/images/"
 

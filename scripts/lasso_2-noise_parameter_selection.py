@@ -21,6 +21,7 @@ sparsity_level = 10
 # We define the main components of our problem
 Phi = np.random.randn(data_number, data_size)
 x0 = np.sign(sparse.randn(data_size, 1, sparsity_level))
+x0 = sparse.randn(data_size, 1, sparsity_level)
 y = Phi@x0
 noisy_vector = np.random.randn(data_number, 1)
 
