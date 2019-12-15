@@ -52,8 +52,8 @@ def L1_ball(x, s=1):
     v = x.flatten()
     u = np.abs(v) # compute the vector of absolute values
     if u.sum() <= s: # check if v is already a solution
-        return v.reshape(n,1)
-    w = proj_simplex(u, s) # project *u* on the simplex
+        return x
+    w = simplex(u, s) # project *u* on the simplex
     w *= np.sign(v) # compute the solution to the original problem on v
     return w.reshape(dimension)
 
