@@ -57,7 +57,7 @@ def L1_ball(x, s=1):
     w *= np.sign(v) # compute the solution to the original problem on v
     return w.reshape(dimension)
 
-def L1_wavelet_ball(x, mu):
+def L1_wavelet_ball(x, mu=1):
     """ Compute the projection of x onto the set
         ||Wx||_1 <= mu
         where W is the orthogonal wavelet transform and mu > 0
