@@ -27,6 +27,14 @@ def dct2(image):
 def idct2(coefficient):
     return idct(idct(coefficient.T, norm='ortho').T, norm='ortho')
 
+def create_kernel(kernel_size, kernel_std):
+    x = np.concatenate((
+                       np.arange(0, kernel_size / 2), np.arange(-kernel_size / 2, 0)))
+    [Y, X] = np.meshgrid(x, x)
+    kernel = np.exp((-X**2 - Y**2) / (2 * kernel_std**2))
+    kernel = kernel / sum(kernel.flatten())
+    return kernel
+
 def gaussian_kernel(kernel_size, kernel_std, im_shape):
     kernel = create_kernel(kernel_size, kernel_std)
     padded_kernel = np.zeros(im_shape)

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
         name="invprob",
-        version="0.0.3",
+        version="0.0.4",
         author="Guillaume Garrigos",
         author_email="guillaume.garrigos@lpsm.paris",
         packages=["invprob"],
