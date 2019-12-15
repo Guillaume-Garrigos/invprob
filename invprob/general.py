@@ -6,7 +6,7 @@ from scipy import ndimage
 # general.py TODO: try to not make use of transform.resize
 from skimage import transform ## commented
 
-def dot(x, y):
+def dotp(x, y):
     """ Returns the euclidean scalar product between two
     arrays of the same dimension
     """
