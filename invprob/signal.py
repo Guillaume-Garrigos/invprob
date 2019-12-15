@@ -10,6 +10,16 @@ from . import general as nt # nt is the NumericalTour toolbox by Gabriel Peyre
 
 from scipy.fftpack import dct
 from scipy.fftpack import idct
+from skimage.io import imread as skimread
+from skimage.util.dtype import img_as_float
+
+def imread(image_path):
+    # Takes an image file (.png, .jpg etc) and returns a 2D np.array
+    return img_as_float(skimread(image_path))
+
+def imshow(image):
+    # Takes an 2D np.array and displays it in shades of gray
+    _ = plt.imshow(image, cmap="gray", interpolation="none")
 
 def dct2(image):
     return dct(dct(image.T, norm='ortho').T, norm='ortho')
