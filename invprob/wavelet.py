@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab
 
+#########################################
+# transform
+# inverse_transform
+#########################################
+
 def transform(x, Jmin=2):
     """
     Compute the wavelet transform of x
