@@ -6,6 +6,11 @@ from scipy import ndimage
 # general.py TODO: try to not make use of transform.resize
 from skimage import transform ## commented
 
+def dot(x, y):
+    """ Returns the euclidean scalar product between two
+    arrays of the same dimension
+    """
+    return np.sum(x*y)
 
 def crop(M, n=None):
     """ crop - crop an image to reduce its size
