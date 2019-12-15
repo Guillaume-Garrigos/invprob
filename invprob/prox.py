@@ -56,3 +56,11 @@ def L1_ball(x, s=1):
     w = proj_simplex(u, s) # project *u* on the simplex
     w *= np.sign(v) # compute the solution to the original problem on v
     return w.reshape(dimension)
+
+def L1_wavelet_ball(x, mu):
+    """ Compute the projection of x onto the set
+        ||Wx||_1 <= mu
+        where W is the orthogonal wavelet transform and mu > 0
+    """
+    return wavelet.inverse_transform(L1_ball(wavelet.transform(x), mu))
+
