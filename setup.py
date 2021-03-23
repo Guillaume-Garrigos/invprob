@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="invprob",
-    version="0.0.13",
+    version="0.0.14",
     author="Guillaume Garrigos",
     author_email="guillaume.garrigos@lpsm.paris",
     license="MIT",
@@ -22,7 +22,6 @@ setup(
     python_requires='>=3.7',
     install_requires=[
             "numpy >= 1.9",
-            "pylab",
             "matplotlib",
             "scipy",
             "scikit-image"
