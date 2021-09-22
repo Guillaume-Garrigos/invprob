@@ -27,9 +27,10 @@ data_repo = "scripts/../data/images/"
 
 # We can blur images
 # comete = signal.load_image(data_repo + 'comete.png')
-im = img_as_float(imread(data_repo + 'comete.png'))
+im = img_as_float(imread('comete.png'))
 _ = plt.figure(dpi=dpi)
 _ = plt.imshow(im, cmap="gray", interpolation="none")
+
 
 
 def create_kernel(kernel_size, kernel_std):
