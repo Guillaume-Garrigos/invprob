@@ -38,13 +38,13 @@ def fb_lasso(A, y, reg_param, iter_nb, x_ini=None, inertia=False, verbose=False)
     forward_backward = lambda x, param: sparse.soft_thresholding(gradient(x), param*stepsize)
     x_old = x
     for k in range(iter_nb):
-        x, x_old = forward_backward( (1+alpha[k])*x - alpha[k]*x_old, param[k] ), x
         if verbose:
             regret[k] = 0.5 * la.norm(A@x - y, 2)**2 + param[k] * la.norm(x, 1)
-            support.append( tuple(np.argwhere(np.abs(x) > 1e-15).flatten()) )
+            support.append( tuple(np.where(np.abs(x) > 1e-15)[0]) )
             sparsity[k] = len(support[k])
             path[:, k] = x.reshape((x.shape[0]))
-
+        x, x_old = forward_backward( (1+alpha[k])*x - alpha[k]*x_old, param[k] ), x
+        
     # Output
     if verbose:
         details = {
