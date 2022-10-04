@@ -56,3 +56,59 @@ def fb_lasso(A, y, reg_param, iter_nb, x_ini=None, inertia=False, verbose=False)
         return x, details
     else:
         return x
+
+def cp_lasso(A, y, iter_nb, stepsize_factor=None, x_ini=None, inertia=False, verbose=False):
+    ''' Use the Chambolle-Pock algorithm to find a minimizer of:
+             norm(x,1) over the constraint Ax=y
+        Eventually outputs the functional values and support of the iterates
+        while running the method
+    '''
+    # Manage optional input/output
+    if verbose:  # Optional output
+        objective_gap = np.zeros(iter_nb)
+        constraint_gap = np.zeros(iter_nb)
+        sparsity = np.zeros(iter_nb)
+        support = []
+        path = np.zeros((A.shape[1], iter_nb))
+    if x_ini is not None:  # Optional initialization
+        x = x_ini
+    else:
+        x = np.zeros((A.shape[1], 1))
+    if stepsize_factor is not None:  # Optional
+        stepsize_factor = stepsize_factor
+    else:
+        stepsize_factor = 1
+    if inertia:
+        alpha = [k/(k+3) for k in np.arange(iter_nb)] # asymptotically equivalent to Nesterov
+    else:
+        alpha = np.zeros(iter_nb) # no inertia
+
+    # The core of the algorithm
+    stepsize = stepsize_factor / la.norm(A, 2) # sigma and tau in the C-P paper or Condat
+    u = A@x
+    x_extrap = x
+    for k in range(iter_nb):
+        if verbose:
+            objective_gap[k] = la.norm(x, 1)
+            constraint_gap[k] = la.norm(A@x - y, 2)
+            support.append( tuple(np.where(np.abs(x) > 1e-15)[0]) )
+            sparsity[k] = len(support[k])
+            path[:, k] = x.reshape((x.shape[0]))
+        
+        u = u + stepsize*((A@x_extrap) - y)
+        x_old = x
+        x = sparse.soft_thresholding( x - stepsize*A.T@u , stepsize)
+        x_extrap = 2*x - x_old
+        
+    # Output
+    if verbose:
+        details = {
+            "objective_gap": objective_gap,
+            "constraint_gap": constraint_gap,
+            "iterate_support": support,
+            "iterate_sparsity": sparsity,
+            "iterate_path": path
+        }
+        return x, details
+    else:
+        return x
